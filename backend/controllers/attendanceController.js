@@ -299,9 +299,7 @@ const qrMarkOption = async (req, res) => {
         });
       } else {
         attendance.status = status;
-        if (!attendance.clockIn) {
-          attendance.clockIn = timeString;
-        }
+        attendance.clockIn = timeString;
         attendance.shift = selectedShift;
         await attendance.save();
       }
