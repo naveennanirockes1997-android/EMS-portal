@@ -158,9 +158,23 @@ const Dashboard = () => {
   // Define department colors for chart
   const COLORS = ['#6366f1', '#a855f7', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'];
 
-  const qrHost = stats?.localIp || 'localhost';
-  const qrPort = window.location.port || '3001';
-  const qrTargetUrl = `http://${qrHost}:${qrPort}/qr-mark?email=${user?.email}`;
+  const getQrTargetUrl = () => {
+    const hostname = window.location.hostname;
+    const isProd = 
+      hostname !== 'localhost' && 
+      hostname !== '127.0.0.1' && 
+      !hostname.startsWith('192.168.') && 
+      !hostname.startsWith('10.') && 
+      !hostname.startsWith('172.');
+    if (isProd) {
+      return `${window.location.origin}/qr-mark?email=${user?.email}`;
+    }
+    const qrHost = stats?.localIp || 'localhost';
+    const qrPort = window.location.port || '3001';
+    return `http://${qrHost}:${qrPort}/qr-mark?email=${user?.email}`;
+  };
+
+  const qrTargetUrl = getQrTargetUrl();
 
   return (
     <div className="space-y-8 animate-fadeIn">
