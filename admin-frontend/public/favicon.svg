@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3c52f5" />
+      <stop offset="50%" stop-color="#5375ff" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    
+    <!-- White-to-Cyan/Blue gradient for the logo elements to make them look premium -->
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+
+    <!-- Subtle glow filter -->
+    <filter id="subtleGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Background -->
+  <rect x="24" y="24" width="464" height="464" rx="120" fill="url(#bgGrad)" />
+
+  <!-- Inner border for glassmorphic depth -->
+  <rect x="24" y="24" width="464" height="464" rx="120" fill="none" stroke="#ffffff" stroke-width="6" stroke-opacity="0.15" />
+
+  <!-- Stylized Employee & Portal Monogram ("E" shape) -->
+  <g filter="url(#subtleGlow)">
+    <!-- Stylized Person / Vertical Axis -->
+    <!-- Head -->
+    <circle cx="170" cy="110" r="32" fill="url(#logoGrad)" />
+    <!-- Body / Spine -->
+    <rect x="138" y="160" width="64" height="242" rx="32" fill="url(#logoGrad)" />
+
+    <!-- Connection / Growth Bars (forming the letter E) -->
+    <!-- Top Bar (Leadership/Vision) -->
+    <rect x="226" y="180" width="154" height="52" rx="26" fill="url(#logoGrad)" opacity="0.95" />
+    <circle cx="380" cy="206" r="14" fill="#ffffff" opacity="0.9" />
+
+    <!-- Middle Bar (Synergy/Teamwork) -->
+    <rect x="226" y="262" width="114" height="52" rx="26" fill="url(#logoGrad)" opacity="0.85" />
+    
+    <!-- Bottom Bar (Base/Stability) -->
+    <rect x="226" y="344" width="154" height="52" rx="26" fill="url(#logoGrad)" opacity="0.95" />
+    <circle cx="380" cy="370" r="14" fill="#ffffff" opacity="0.9" />
+  </g>
+</svg>
