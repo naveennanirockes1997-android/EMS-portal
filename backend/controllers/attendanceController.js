@@ -50,6 +50,7 @@ const clockIn = async (req, res) => {
       date: today,
       status,
       clockIn: timeString,
+      shift: 'Morning Shift (09:00 AM - 05:00 PM)',
     });
 
     res.status(201).json({
@@ -138,7 +139,7 @@ const getDailyAttendance = async (req, res) => {
 // @access  Private (Admin & HR only)
 const adminMarkAttendance = async (req, res) => {
   try {
-    const { employeeId, date, status, clockIn, clockOut } = req.body;
+    const { employeeId, date, status, clockIn, clockOut, shift } = req.body;
 
     if (!employeeId || !date || !status) {
       return res.status(400).json({ success: false, message: 'Please provide employeeId, date and status' });
@@ -156,6 +157,7 @@ const adminMarkAttendance = async (req, res) => {
       attendance.status = status;
       if (clockIn) attendance.clockIn = clockIn;
       if (clockOut) attendance.clockOut = clockOut;
+      if (shift) attendance.shift = shift;
       await attendance.save();
     } else {
       // Create new
@@ -165,6 +167,7 @@ const adminMarkAttendance = async (req, res) => {
         status,
         clockIn: clockIn || '09:00 AM',
         clockOut: clockOut || '05:00 PM',
+        shift: shift || 'Morning Shift (09:00 AM - 05:00 PM)',
       });
     }
 
@@ -231,7 +234,7 @@ const getMonthlySummary = async (req, res) => {
 // @route   POST /api/attendance/qr-mark-option
 // @access  Public
 const qrMarkOption = async (req, res) => {
-  const { email, option } = req.body;
+  const { email, option, shift } = req.body;
 
   try {
     if (!email || !option) {
@@ -265,13 +268,25 @@ const qrMarkOption = async (req, res) => {
       hour12: true,
     });
 
+    const selectedShift = shift || 'Morning Shift (09:00 AM - 05:00 PM)';
+
     if (option === 'Present') {
       let status = 'Present';
       const hour = now.getHours();
       const minute = now.getMinutes();
 
-      if (hour > 9 || (hour === 9 && minute > 15)) {
-        status = 'Late';
+      if (selectedShift.includes('Afternoon')) {
+        if (hour > 14 || (hour === 14 && minute > 15)) {
+          status = 'Late';
+        }
+      } else if (selectedShift.includes('Night')) {
+        if (hour > 22 || (hour === 22 && minute > 15)) {
+          status = 'Late';
+        }
+      } else {
+        if (hour > 9 || (hour === 9 && minute > 15)) {
+          status = 'Late';
+        }
       }
 
       if (!attendance) {
@@ -280,12 +295,14 @@ const qrMarkOption = async (req, res) => {
           date: now,
           status,
           clockIn: timeString,
+          shift: selectedShift,
         });
       } else {
         attendance.status = status;
         if (!attendance.clockIn) {
           attendance.clockIn = timeString;
         }
+        attendance.shift = selectedShift;
         await attendance.save();
       }
     } else {
@@ -297,11 +314,13 @@ const qrMarkOption = async (req, res) => {
           status: 'Absent',
           clockIn: '',
           clockOut: '',
+          shift: selectedShift,
         });
       } else {
         attendance.status = 'Absent';
         attendance.clockIn = '';
         attendance.clockOut = '';
+        attendance.shift = selectedShift;
         await attendance.save();
       }
     }
@@ -314,6 +333,7 @@ const qrMarkOption = async (req, res) => {
         email: employee.email,
         status: attendance.status,
         clockIn: attendance.clockIn,
+        shift: attendance.shift,
       },
     });
   } catch (error) {

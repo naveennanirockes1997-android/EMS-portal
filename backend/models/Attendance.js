@@ -24,6 +24,9 @@ const AttendanceSchema = new mongoose.Schema(
     clockOut: {
       type: String, // e.g. "05:00 PM"
     },
+    shift: {
+      type: String, // e.g. "Morning Shift (09:00 AM - 05:00 PM)"
+    },
   },
   {
     timestamps: true,

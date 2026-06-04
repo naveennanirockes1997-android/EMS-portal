@@ -188,6 +188,7 @@ const AttendanceHistory = () => {
             <thead>
               <tr className="border-b border-white/5 text-xs text-slate-400 font-semibold uppercase tracking-wider bg-slate-900/20">
                 <th className="py-4 px-6">Date</th>
+                <th className="py-4 px-6">Shift</th>
                 <th className="py-4 px-6">Status</th>
                 <th className="py-4 px-6">Clock In Time</th>
                 <th className="py-4 px-6">Clock Out Time</th>
@@ -196,13 +197,13 @@ const AttendanceHistory = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="4" className="py-12 text-center">
+                  <td colSpan="5" className="py-12 text-center">
                     <div className="w-8 h-8 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mx-auto"></div>
                   </td>
                 </tr>
               ) : attendance.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="py-12 text-center text-slate-500 text-sm">
+                  <td colSpan="5" className="py-12 text-center text-slate-500 text-sm">
                     No attendance records found. Click in today to start log!
                   </td>
                 </tr>
@@ -211,6 +212,9 @@ const AttendanceHistory = () => {
                   <tr key={record._id} className="border-b border-white/[0.03] text-sm text-slate-300 hover:bg-slate-800/10 transition-colors">
                     <td className="py-4 px-6 font-medium text-slate-200">
                       {new Date(record.date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                    </td>
+                    <td className="py-4 px-6 text-xs text-slate-300 font-medium">
+                      {record.shift || 'Morning Shift (09:00 AM - 05:00 PM)'}
                     </td>
                     <td className="py-4 px-6">
                       {getStatusBadge(record.status)}

@@ -3,6 +3,12 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { CheckCircle2, XCircle, Clock, AlertTriangle, CalendarDays, ArrowLeft, Check, Loader } from 'lucide-react';
 
+const SHIFTS = [
+  { id: 'morning', name: 'Morning Shift', timings: '09:00 AM - 05:00 PM', value: 'Morning Shift (09:00 AM - 05:00 PM)' },
+  { id: 'afternoon', name: 'Afternoon Shift', timings: '02:00 PM - 10:00 PM', value: 'Afternoon Shift (02:00 PM - 10:00 PM)' },
+  { id: 'night', name: 'Night Shift', timings: '10:00 PM - 06:00 AM', value: 'Night Shift (10:00 PM - 06:00 AM)' }
+];
+
 const QrMark = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email');
@@ -13,6 +19,7 @@ const QrMark = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [markedOption, setMarkedOption] = useState(null); // 'Present' or 'Absent'
   const [resultData, setResultData] = useState(null);
+  const [selectedShift, setSelectedShift] = useState(SHIFTS[0].value);
 
   const handleMark = async (option) => {
     if (!email) {
@@ -24,7 +31,11 @@ const QrMark = () => {
     setLoading(true);
     setErrorMsg('');
     try {
-      const res = await api.post('/attendance/qr-mark-option', { email, option });
+      const res = await api.post('/attendance/qr-mark-option', { 
+        email, 
+        option,
+        shift: selectedShift
+      });
       if (res.data.success) {
         setMarkedOption(option);
         setResultData(res.data.data);
@@ -73,6 +84,43 @@ const QrMark = () => {
                 </div>
               )}
 
+              {/* Shift Selection */}
+              {email && (
+                <div className="space-y-3">
+                  <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 font-outfit block text-left">
+                    Select Work Shift & Timings
+                  </label>
+                  <div className="grid grid-cols-1 gap-2.5">
+                    {SHIFTS.map((shift) => (
+                      <button
+                        key={shift.id}
+                        type="button"
+                        onClick={() => setSelectedShift(shift.value)}
+                        className={`w-full flex items-center justify-between p-4 rounded-xl border text-left transition-all duration-200 ${
+                          selectedShift === shift.value
+                            ? 'bg-indigo-500/10 border-indigo-500/50 shadow-md shadow-indigo-500/5'
+                            : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.04]'
+                        }`}
+                      >
+                        <div>
+                          <p className="text-xs font-bold text-slate-200 font-outfit">{shift.name}</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-indigo-400" /> {shift.timings}
+                          </p>
+                        </div>
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          selectedShift === shift.value
+                            ? 'border-indigo-500 bg-indigo-500 text-white'
+                            : 'border-white/20'
+                        }`}>
+                          {selectedShift === shift.value && <div className="w-1.5 h-1.5 rounded-full bg-white"></div>}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Action Cards */}
               <div className="space-y-4 pt-2">
                 {/* Present Option */}
@@ -88,7 +136,7 @@ const QrMark = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-emerald-400 font-outfit text-sm">Mark Present</h3>
-                      <p className="text-[11px] text-slate-400 mt-0.5">Clock in with current timestamp</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Clock in for selected shift</p>
                     </div>
                   </div>
                   <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -165,6 +213,12 @@ const QrMark = () => {
                     {resultData.status}
                   </span>
                 </div>
+                {resultData.shift && (
+                  <div className="flex justify-between items-center text-xs font-semibold border-b border-white/5 pb-2">
+                    <span className="text-slate-400">Shift timing:</span>
+                    <span className="text-indigo-400 text-right">{resultData.shift}</span>
+                  </div>
+                )}
                 {markedOption === 'Present' && resultData.clockIn && (
                   <div className="flex justify-between items-center text-xs font-semibold">
                     <span className="text-slate-400">Time Registered:</span>

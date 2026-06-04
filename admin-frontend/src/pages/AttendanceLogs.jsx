@@ -30,7 +30,8 @@ const AttendanceLogs = () => {
   const [formData, setFormData] = useState({
     status: 'Present',
     clockIn: '',
-    clockOut: ''
+    clockOut: '',
+    shift: 'Morning Shift (09:00 AM - 05:00 PM)'
   });
 
   const fetchLogs = async () => {
@@ -75,7 +76,8 @@ const AttendanceLogs = () => {
     setFormData({
       status: existingLog?.status || 'Present',
       clockIn: existingLog?.clockIn || '',
-      clockOut: existingLog?.clockOut || ''
+      clockOut: existingLog?.clockOut || '',
+      shift: existingLog?.shift || 'Morning Shift (09:00 AM - 05:00 PM)'
     });
     setIsOpen(true);
   };
@@ -210,6 +212,7 @@ const AttendanceLogs = () => {
               <tr className="border-b border-white/5 text-xs text-slate-400 font-semibold uppercase tracking-wider bg-slate-900/20">
                 <th className="py-4 px-6">Employee Info</th>
                 <th className="py-4 px-6">Department</th>
+                <th className="py-4 px-6">Shift</th>
                 <th className="py-4 px-6">Log Status</th>
                 <th className="py-4 px-6">Clock In Time</th>
                 <th className="py-4 px-6">Clock Out Time</th>
@@ -219,13 +222,13 @@ const AttendanceLogs = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="py-12 text-center">
+                  <td colSpan="7" className="py-12 text-center">
                     <div className="w-8 h-8 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mx-auto"></div>
                   </td>
                 </tr>
               ) : filteredEmployees.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="py-12 text-center text-slate-500 text-sm">
+                  <td colSpan="7" className="py-12 text-center text-slate-500 text-sm">
                     No matching employee logs found.
                   </td>
                 </tr>
@@ -248,6 +251,9 @@ const AttendanceLogs = () => {
                       </td>
                       <td className="py-4 px-6 text-slate-300 font-medium">
                         {emp.department}
+                      </td>
+                      <td className="py-4 px-6 text-xs text-slate-300 font-medium">
+                        {log?.shift || 'Morning Shift (09:00 AM - 05:00 PM)'}
                       </td>
                       <td className="py-4 px-6">
                         {getStatusBadge(log?.status)}
@@ -309,6 +315,21 @@ const AttendanceLogs = () => {
                   <option value="Late">Late</option>
                   <option value="Half-day">Half-day</option>
                   <option value="Absent">Absent</option>
+                </select>
+              </div>
+
+              {/* Select Shift */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300">Work Shift & Timings</label>
+                <select
+                  name="shift"
+                  value={formData.shift}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2.5 rounded-xl glass-input text-sm"
+                >
+                  <option value="Morning Shift (09:00 AM - 05:00 PM)">Morning Shift (09:00 AM - 05:00 PM)</option>
+                  <option value="Afternoon Shift (02:00 PM - 10:00 PM)">Afternoon Shift (02:00 PM - 10:00 PM)</option>
+                  <option value="Night Shift (10:00 PM - 06:00 AM)">Night Shift (10:00 PM - 06:00 AM)</option>
                 </select>
               </div>
 
