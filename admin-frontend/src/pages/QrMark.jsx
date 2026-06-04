@@ -47,7 +47,8 @@ const QrMark = () => {
     } catch (err) {
       console.error('QR mark option error:', err);
       setStatus('error');
-      setErrorMsg(err.response?.data?.message || 'Server error occurred.');
+      const targetUrl = (api.defaults.baseURL || '') + '/attendance/qr-mark-option';
+      setErrorMsg(err.response?.data?.message || `Server connection error. Tried calling: ${targetUrl}. Please ensure your backend is online.`);
     } finally {
       setLoading(false);
     }
