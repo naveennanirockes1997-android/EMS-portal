@@ -173,7 +173,7 @@ const getMyAttendance = async (req, res) => {
 // @access  Private (Admin & HR only)
 const getDailyAttendance = async (req, res) => {
   try {
-    const dateStr = req.query.date || new Date().toISOString().split('T')[0];
+    const dateStr = req.query.date || new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
     const { start, end } = getDateRange(dateStr);
 
     const attendanceRecords = await Attendance.find({
@@ -241,8 +241,9 @@ const adminMarkAttendance = async (req, res) => {
 const getMonthlySummary = async (req, res) => {
   try {
     const employeeId = req.params.employeeId || req.user._id;
-    const year = parseInt(req.query.year) || new Date().getFullYear();
-    const month = parseInt(req.query.month) || (new Date().getMonth() + 1); // 1-12
+    const indiaDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    const year = parseInt(req.query.year) || indiaDate.getFullYear();
+    const month = parseInt(req.query.month) || (indiaDate.getMonth() + 1); // 1-12
 
     const start = new Date(year, month - 1, 1);
     const end = new Date(year, month, 0, 23, 59, 59, 999);
