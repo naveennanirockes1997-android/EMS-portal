@@ -158,6 +158,10 @@ const Dashboard = () => {
   // Define department colors for chart
   const COLORS = ['#6366f1', '#a855f7', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'];
 
+  const qrHost = stats?.localIp || 'localhost';
+  const qrPort = window.location.port || '3001';
+  const qrTargetUrl = `http://${qrHost}:${qrPort}/qr-mark?email=${user?.email}`;
+
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Welcome banner */}
@@ -416,6 +420,42 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+
+          {/* Mobile QR Attendance */}
+          <div className="glass rounded-3xl p-6 border border-white/5 shadow-xl text-center space-y-4 max-w-md mx-auto mt-8">
+            <h3 className="text-lg font-bold font-outfit text-white text-left">Mobile QR Attendance</h3>
+            <p className="text-xs text-slate-400 text-left leading-relaxed">
+              Scan this QR code using your mobile phone's camera, then choose whether you are <strong>Present</strong> or <strong>Absent</strong> on your mobile screen.
+            </p>
+            
+            {/* QR Image */}
+            <div className="inline-block p-4 rounded-2xl bg-white/5 border border-white/5 relative group cursor-pointer">
+              <div className="relative overflow-hidden rounded-xl">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=6366f1&bgcolor=0f172a&data=${encodeURIComponent(
+                    qrTargetUrl
+                  )}`}
+                  alt="My Personal Check-in QR"
+                  className="w-36 h-36 rounded-xl border border-white/10 transition-transform duration-300 group-hover:scale-110"
+                />
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-indigo-950/90 backdrop-blur-xs opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center transition-all duration-300 text-center p-3 rounded-xl border border-indigo-500/30">
+                  <span className="animate-bounce mb-1 text-lg">📱</span>
+                  <span className="text-[10px] font-extrabold font-outfit text-indigo-400 uppercase tracking-wider block">Scan Here</span>
+                  <span className="text-[9px] text-slate-300 leading-normal block mt-1">to mark attendance!</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Simulation Link */}
+            <button
+              type="button"
+              onClick={() => window.open(qrTargetUrl, '_blank')}
+              className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-400 font-semibold text-xs border border-indigo-500/20 flex items-center justify-center gap-2 transition-all duration-200"
+            >
+              <span>Simulate Phone Scan (Open in New Tab)</span>
+            </button>
+          </div>
         </>
       )}
 
@@ -470,6 +510,42 @@ const Dashboard = () => {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Mobile QR Attendance */}
+            <div className="glass rounded-3xl p-6 border border-white/5 shadow-xl text-center space-y-4">
+              <h3 className="text-lg font-bold font-outfit text-white text-left">Mobile QR Attendance</h3>
+              <p className="text-xs text-slate-400 text-left leading-relaxed">
+                Scan this QR code using your mobile phone's camera, then choose whether you are <strong>Present</strong> or <strong>Absent</strong> on your mobile screen.
+              </p>
+              
+              {/* QR Image */}
+              <div className="inline-block p-4 rounded-2xl bg-white/5 border border-white/5 relative group cursor-pointer">
+                <div className="relative overflow-hidden rounded-xl">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=6366f1&bgcolor=0f172a&data=${encodeURIComponent(
+                      qrTargetUrl
+                    )}`}
+                    alt="My Personal Check-in QR"
+                    className="w-36 h-36 rounded-xl border border-white/10 transition-transform duration-300 group-hover:scale-110"
+                  />
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-indigo-950/90 backdrop-blur-xs opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center transition-all duration-300 text-center p-3 rounded-xl border border-indigo-500/30">
+                    <span className="animate-bounce mb-1 text-lg">📱</span>
+                    <span className="text-[10px] font-extrabold font-outfit text-indigo-400 uppercase tracking-wider block">Scan Here</span>
+                    <span className="text-[9px] text-slate-300 leading-normal block mt-1">to mark attendance!</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Simulation Link */}
+              <button
+                type="button"
+                onClick={() => window.open(qrTargetUrl, '_blank')}
+                className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-400 font-semibold text-xs border border-indigo-500/20 flex items-center justify-center gap-2 transition-all duration-200"
+              >
+                <span>Simulate Phone Scan (Open in New Tab)</span>
+              </button>
             </div>
 
             {/* Leave Metrics */}

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { Briefcase, Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 
@@ -59,7 +59,6 @@ const Login = () => {
         <div className="glass rounded-3xl p-8 shadow-2xl border border-white/5 relative">
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent rounded-3xl pointer-events-none"></div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
             {/* Error alerts */}
             {(localError || error) && (
@@ -125,6 +124,19 @@ const Login = () => {
               )}
             </button>
           </form>
+
+          {/* Links for Signup & Forgot Password */}
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+            <Link to="/forgot-password" className="hover:text-indigo-400 transition-all">
+              Forgot Password?
+            </Link>
+            <span>
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-indigo-400 hover:text-indigo-300 font-semibold transition-all">
+                Sign Up
+              </Link>
+            </span>
+          </div>
         </div>
 
         {/* Demo Credentials */}

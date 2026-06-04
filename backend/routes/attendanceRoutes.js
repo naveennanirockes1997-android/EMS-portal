@@ -7,8 +7,11 @@ const {
   getDailyAttendance,
   adminMarkAttendance,
   getMonthlySummary,
+  qrMarkOption,
 } = require('../controllers/attendanceController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+
+router.post('/qr-mark-option', qrMarkOption);
 
 router.use(protect);
 

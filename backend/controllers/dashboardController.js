@@ -2,6 +2,21 @@ const Employee = require('../models/Employee');
 const Attendance = require('../models/Attendance');
 const Leave = require('../models/Leave');
 const Department = require('../models/Department');
+const os = require('os');
+
+const getLocalIp = () => {
+  const interfaces = os.networkInterfaces();
+  for (const devName in interfaces) {
+    const iface = interfaces[devName];
+    for (let i = 0; i < iface.length; i++) {
+      const alias = iface[i];
+      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+        return alias.address;
+      }
+    }
+  }
+  return 'localhost';
+};
 
 // Helper to get start and end of today
 const getTodayRange = () => {
@@ -117,6 +132,7 @@ const getAdminStats = async (req, res) => {
         roleBreakdown,
         recentLeaves,
         recentEmployees,
+        localIp: getLocalIp(),
       },
     });
   } catch (error) {
@@ -183,6 +199,7 @@ const getEmployeeStats = async (req, res) => {
         leaveStats,
         attendanceStats,
         todayClockStatus,
+        localIp: getLocalIp(),
       },
     });
   } catch (error) {

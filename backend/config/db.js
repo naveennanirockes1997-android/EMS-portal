@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
+const dns = require('dns');
+
+// Set DNS servers to Google DNS to fix SRV lookup failures
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (e) {
+  console.log('Could not set custom DNS servers:', e.message);
+}
 
 let mongod = null;
 

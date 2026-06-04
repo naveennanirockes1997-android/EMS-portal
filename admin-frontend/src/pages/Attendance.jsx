@@ -25,18 +25,13 @@ const AttendanceHistory = () => {
     setLoading(true);
     setErrorMsg('');
     try {
-      // 1. Fetch full logs
-      const logsRes = await api.get('/attendance/my-attendance');
-      if (logsRes.data.success) {
-        setAttendance(logsRes.data.data);
-      }
-
-      // 2. Fetch monthly summary
+      // Fetch monthly summary which contains both summary scorecard and filtered history logs
       const summaryRes = await api.get('/attendance/summary', {
         params: { year: selectedYear, month: selectedMonth }
       });
       if (summaryRes.data.success) {
         setSummary(summaryRes.data.data.summary);
+        setAttendance(summaryRes.data.data.history);
       }
     } catch (err) {
       console.error(err);

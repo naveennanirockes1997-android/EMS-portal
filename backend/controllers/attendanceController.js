@@ -227,6 +227,100 @@ const getMonthlySummary = async (req, res) => {
   }
 };
 
+// @desc    Mark attendance via QR Scan (Present or Absent option)
+// @route   POST /api/attendance/qr-mark-option
+// @access  Public
+const qrMarkOption = async (req, res) => {
+  const { email, option } = req.body;
+
+  try {
+    if (!email || !option) {
+      return res.status(400).json({ success: false, message: 'Please provide email and option' });
+    }
+
+    if (option !== 'Present' && option !== 'Absent') {
+      return res.status(400).json({ success: false, message: 'Option must be Present or Absent' });
+    }
+
+    const employee = await Employee.findOne({ email });
+    if (!employee) {
+      return res.status(404).json({ success: false, message: 'Employee not found with this email' });
+    }
+
+    // Today's range
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+
+    let attendance = await Attendance.findOne({
+      employeeId: employee._id,
+      date: { $gte: start, $lte: end },
+    });
+
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    if (option === 'Present') {
+      let status = 'Present';
+      const hour = now.getHours();
+      const minute = now.getMinutes();
+
+      if (hour > 9 || (hour === 9 && minute > 15)) {
+        status = 'Late';
+      }
+
+      if (!attendance) {
+        attendance = await Attendance.create({
+          employeeId: employee._id,
+          date: now,
+          status,
+          clockIn: timeString,
+        });
+      } else {
+        attendance.status = status;
+        if (!attendance.clockIn) {
+          attendance.clockIn = timeString;
+        }
+        await attendance.save();
+      }
+    } else {
+      // option === 'Absent'
+      if (!attendance) {
+        attendance = await Attendance.create({
+          employeeId: employee._id,
+          date: now,
+          status: 'Absent',
+          clockIn: '',
+          clockOut: '',
+        });
+      } else {
+        attendance.status = 'Absent';
+        attendance.clockIn = '';
+        attendance.clockOut = '';
+        await attendance.save();
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Successfully marked attendance as ${option === 'Present' ? 'Present' : 'Absent'}`,
+      data: {
+        name: employee.name,
+        email: employee.email,
+        status: attendance.status,
+        clockIn: attendance.clockIn,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   clockIn,
   clockOut,
@@ -234,4 +328,5 @@ module.exports = {
   getDailyAttendance,
   adminMarkAttendance,
   getMonthlySummary,
+  qrMarkOption,
 };

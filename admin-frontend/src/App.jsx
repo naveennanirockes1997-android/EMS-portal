@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 const AppLayout = lazy(() => import('./components/AppLayout'));
 const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const QrMark = lazy(() => import('./pages/QrMark'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Employees = lazy(() => import('./pages/Employees'));
 const Departments = lazy(() => import('./pages/Departments'));
@@ -16,8 +19,11 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Suspense fallback={<div className="flex justify-center items-center h-full"><div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div></div>}><Routes>
+        <Suspense fallback={<div className="flex justify-center items-center h-full"><div className="w-12 h-12 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div></div>}><Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/qr-mark" element={<QrMark />} />
           <Route element={<AppLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/employees" element={<Employees />} />
