@@ -85,41 +85,39 @@ const QrMark = () => {
               )}
 
               {/* Shift Selection */}
-              {email && (
-                <div className="space-y-3">
-                  <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 font-outfit block text-left">
-                    Select Work Shift & Timings
-                  </label>
-                  <div className="grid grid-cols-1 gap-2.5">
-                    {SHIFTS.map((shift) => (
-                      <button
-                        key={shift.id}
-                        type="button"
-                        onClick={() => setSelectedShift(shift.value)}
-                        className={`w-full flex items-center justify-between p-4 rounded-xl border text-left transition-all duration-200 ${
-                          selectedShift === shift.value
-                            ? 'bg-indigo-500/10 border-indigo-500/50 shadow-md shadow-indigo-500/5'
-                            : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.04]'
-                        }`}
-                      >
-                        <div>
-                          <p className="text-xs font-bold text-slate-200 font-outfit">{shift.name}</p>
-                          <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-indigo-400" /> {shift.timings}
-                          </p>
-                        </div>
-                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          selectedShift === shift.value
-                            ? 'border-indigo-500 bg-indigo-500 text-white'
-                            : 'border-white/20'
-                        }`}>
-                          {selectedShift === shift.value && <div className="w-1.5 h-1.5 rounded-full bg-white"></div>}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+              <div className="space-y-3">
+                <label className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 font-outfit block text-left">
+                  Select Work Shift & Timings
+                </label>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {SHIFTS.map((shift) => (
+                    <button
+                      key={shift.id}
+                      type="button"
+                      onClick={() => setSelectedShift(shift.value)}
+                      className={`w-full flex items-center justify-between p-4 rounded-xl border text-left transition-all duration-200 ${
+                        selectedShift === shift.value
+                          ? 'bg-indigo-500/10 border-indigo-500/50 shadow-md shadow-indigo-500/5'
+                          : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.04]'
+                      }`}
+                    >
+                      <div>
+                        <p className="text-xs font-bold text-slate-200 font-outfit">{shift.name}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-indigo-400" /> {shift.timings}
+                        </p>
+                      </div>
+                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                        selectedShift === shift.value
+                          ? 'border-indigo-500 bg-indigo-500 text-white'
+                          : 'border-white/20'
+                      }`}>
+                        {selectedShift === shift.value && <div className="w-1.5 h-1.5 rounded-full bg-white"></div>}
+                      </div>
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
 
               {/* Action Cards */}
               <div className="space-y-4 pt-2">
