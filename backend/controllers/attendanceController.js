@@ -1,12 +1,81 @@
 const Attendance = require('../models/Attendance');
 const Employee = require('../models/Employee');
 
-// Helper to get start and end of a specific date in UTC/local timezone
+// Helper to get time details adjusted to India Standard Time (Asia/Kolkata)
+const getIndiaTimeDetails = () => {
+  const now = new Date();
+  
+  const timeString = now.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Kolkata',
+  });
+
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+    timeZone: 'Asia/Kolkata',
+  });
+
+  const parts = formatter.formatToParts(now);
+  let hour = now.getHours();
+  let minute = now.getMinutes();
+
+  parts.forEach((part) => {
+    if (part.type === 'hour') hour = parseInt(part.value, 10);
+    if (part.type === 'minute') minute = parseInt(part.value, 10);
+  });
+
+  return { timeString, hour, minute };
+};
+
+// Helper to get today's start and end date ranges in Asia/Kolkata timezone
+const getIndiaTodayRange = () => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'Asia/Kolkata'
+  });
+  
+  const parts = formatter.formatToParts(new Date());
+  let year, month, day;
+  parts.forEach(part => {
+    if (part.type === 'year') year = part.value;
+    if (part.type === 'month') month = part.value;
+    if (part.type === 'day') day = part.value;
+  });
+
+  const start = new Date(`${year}-${month}-${day}T00:00:00+05:30`);
+  const end = new Date(`${year}-${month}-${day}T23:59:59.999+05:30`);
+  return { start, end, today: start };
+};
+
+// Helper to get start and end of a specific date in local India timezone
 const getDateRange = (dateStr) => {
-  const start = new Date(dateStr);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(dateStr);
-  end.setHours(23, 59, 59, 999);
+  let targetStr = dateStr;
+  if (dateStr instanceof Date) {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      timeZone: 'Asia/Kolkata'
+    });
+    const parts = formatter.formatToParts(dateStr);
+    let year, month, day;
+    parts.forEach(part => {
+      if (part.type === 'year') year = part.value;
+      if (part.type === 'month') month = part.value;
+      if (part.type === 'day') day = part.value;
+    });
+    targetStr = `${year}-${month}-${day}`;
+  } else if (typeof dateStr === 'string' && dateStr.includes('T')) {
+    targetStr = dateStr.split('T')[0];
+  }
+  const start = new Date(`${targetStr}T00:00:00+05:30`);
+  const end = new Date(`${targetStr}T23:59:59.999+05:30`);
   return { start, end };
 };
 
@@ -15,8 +84,7 @@ const getDateRange = (dateStr) => {
 // @access  Private
 const clockIn = async (req, res) => {
   try {
-    const today = new Date();
-    const { start, end } = getDateRange(today);
+    const { start, end, today } = getIndiaTodayRange();
 
     // Check if already checked in today
     let attendance = await Attendance.findOne({
@@ -28,22 +96,12 @@ const clockIn = async (req, res) => {
       return res.status(400).json({ success: false, message: 'You have already clocked in for today!' });
     }
 
-    // Determine status based on clock in time
-    // Standard time is 9:00 AM. If clocking in after 9:15 AM, status is 'Late'
-    const now = new Date();
-    const hour = now.getHours();
-    const minute = now.getMinutes();
+    const { timeString, hour, minute } = getIndiaTimeDetails();
     let status = 'Present';
 
     if (hour > 9 || (hour === 9 && minute > 15)) {
       status = 'Late';
     }
-
-    const timeString = now.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
 
     attendance = await Attendance.create({
       employeeId: req.user._id,
@@ -68,8 +126,7 @@ const clockIn = async (req, res) => {
 // @access  Private
 const clockOut = async (req, res) => {
   try {
-    const today = new Date();
-    const { start, end } = getDateRange(today);
+    const { start, end } = getIndiaTodayRange();
 
     let attendance = await Attendance.findOne({
       employeeId: req.user._id,
@@ -84,12 +141,7 @@ const clockOut = async (req, res) => {
       return res.status(400).json({ success: false, message: 'You have already clocked out for today!' });
     }
 
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
+    const { timeString } = getIndiaTimeDetails();
 
     attendance.clockOut = timeString;
     await attendance.save();
@@ -250,30 +302,20 @@ const qrMarkOption = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Employee not found with this email' });
     }
 
-    // Today's range
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const end = new Date();
-    end.setHours(23, 59, 59, 999);
+    // Today's range (adjusted to India time)
+    const { start, end, today } = getIndiaTodayRange();
 
     let attendance = await Attendance.findOne({
       employeeId: employee._id,
       date: { $gte: start, $lte: end },
     });
 
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
+    const { timeString, hour, minute } = getIndiaTimeDetails();
 
     const selectedShift = shift || 'Morning Shift (09:00 AM - 05:00 PM)';
 
     if (option === 'Present') {
       let status = 'Present';
-      const hour = now.getHours();
-      const minute = now.getMinutes();
 
       if (selectedShift.includes('Afternoon')) {
         if (hour > 14 || (hour === 14 && minute > 15)) {
@@ -292,7 +334,7 @@ const qrMarkOption = async (req, res) => {
       if (!attendance) {
         attendance = await Attendance.create({
           employeeId: employee._id,
-          date: now,
+          date: today,
           status,
           clockIn: timeString,
           shift: selectedShift,
@@ -308,7 +350,7 @@ const qrMarkOption = async (req, res) => {
       if (!attendance) {
         attendance = await Attendance.create({
           employeeId: employee._id,
-          date: now,
+          date: today,
           status: 'Absent',
           clockIn: '',
           clockOut: '',
